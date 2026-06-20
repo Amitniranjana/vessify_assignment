@@ -14,7 +14,7 @@ export const extractTransaction = async (c: Context) => {
   const parsed = extractTransactionSchema.safeParse(body);
 
   if (!parsed.success) {
-    return c.json({ error: parsed.error.errors }, 400);
+    return c.json({ error: parsed.error.flatten().fieldErrors }, 400);
   }
 
   const { text } = parsed.data;
