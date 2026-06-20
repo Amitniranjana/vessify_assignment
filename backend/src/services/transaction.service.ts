@@ -89,6 +89,24 @@ export function parseTransaction(text: string): ParsedTransaction | null {
 }
 
 export function parseTransactions(text: string): ParsedTransaction[] {
+  // If the entire text contains only ONE date, treat it as a single transaction (handles multi-line samples like Sample 1 and 2)
+  const dateRegex1G = /(\d{1,2})\s+([A-Za-z]{3})\s+(\d{2,4})/g;
+  const dateRegex2G = /(\d{2})\/(\d{2})\/(\d{2,4})/g;
+  const dateRegex3G = /(\d{4})-(\d{2})-(\d{2})/g;
+  
+  const allDates = [
+    ...(text.match(dateRegex1G) || []),
+    ...(text.match(dateRegex2G) || []),
+    ...(text.match(dateRegex3G) || [])
+  ];
+
+  if (allDates.length === 1) {
+    const parsed = parseTransaction(text.replace(/\r?\n/g, ' '));
+    if (parsed && parsed.date && parsed.amount !== 0) {
+      return [parsed];
+    }
+  }
+
   // Split by common line breaks
   const lines = text.split(/\r?\n|(?<=\d{2}\.\d{2}\s)/);
   const transactions: ParsedTransaction[] = [];
