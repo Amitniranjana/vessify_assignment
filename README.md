@@ -2,6 +2,11 @@
 
 A multi-tenant, production-ready full-stack application built to extract and manage personal finance transactions from messy bank statements. 
 
+## Live Demo
+🚀 **Frontend (Vercel):** [https://vessify-assignment-o3g7.vercel.app/](https://vessify-assignment-o3g7.vercel.app/)
+⚙️ **Backend API (Render):** [https://vessify-assignment-fyk3.onrender.com](https://vessify-assignment-fyk3.onrender.com)
+🗄️ **Database:** Supabase PostgreSQL
+
 ## Features
 - **Multi-Tenancy:** Secure data isolation using PostgreSQL `Organization` and `Member` tables.
 - **Transaction Parser Engine:** Automatically extracts dates, amounts, and calculates confidence scores from unstructured bank statements using Regex heuristics.
