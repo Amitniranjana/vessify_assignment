@@ -11,7 +11,7 @@ export const auth = betterAuth({
         enabled: true,
     },
     secret: process.env.BETTER_AUTH_SECRET || "my-super-secret-better-auth-secret",
-    trustedOrigins: ["http://localhost:3000"],
+    trustedOrigins: [process.env.FRONTEND_URL ? process.env.FRONTEND_URL : "http://localhost:3000", "http://localhost:3000"],
     plugins: [bearer()],
     databaseHooks: {
         user: {
