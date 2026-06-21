@@ -27,7 +27,14 @@ export default function RegisterPage() {
       });
 
       if (!res.ok) {
-        throw new Error("Registration failed");
+        let errorMessage = "Registration failed. Please try again.";
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch (e) {
+          // Fallback if response is not JSON
+        }
+        throw new Error(errorMessage);
       }
 
       // After successful registration, log them in using Auth.js Credentials provider
@@ -38,7 +45,7 @@ export default function RegisterPage() {
       });
 
       if (signInRes?.ok) {
-        toast.success("Account created successfully");
+        toast.success("Account created successfully! Welcome aboard 🚀");
         router.push("/");
       } else {
         toast.error("Account created, but automatic login failed");
@@ -53,7 +60,7 @@ export default function RegisterPage() {
 
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md shadow-xl">
+      <Card className="w-full max-w-md shadow-xl border-t-4 border-t-black">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
           <CardDescription>Sign up to start extracting transactions</CardDescription>
@@ -65,9 +72,10 @@ export default function RegisterPage() {
               <input
                 type="text"
                 required
+                minLength={2}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black transition-all duration-200"
                 placeholder="John Doe"
               />
             </div>
@@ -78,7 +86,7 @@ export default function RegisterPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black transition-all duration-200"
                 placeholder="you@example.com"
               />
             </div>
@@ -87,13 +95,15 @@ export default function RegisterPage() {
               <input
                 type="password"
                 required
+                minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-                placeholder="••••••••"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black transition-all duration-200"
+                placeholder="Must be at least 8 characters"
               />
+              <p className="text-xs text-gray-500 mt-1">Minimum 8 characters required</p>
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full transition-transform active:scale-95" disabled={loading}>
               {loading ? "Creating Account..." : "Sign Up"}
             </Button>
             <p className="text-center text-sm text-gray-600 mt-4">

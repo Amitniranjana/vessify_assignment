@@ -17,27 +17,31 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    try {
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
-    setLoading(false);
-
-    if (res?.error) {
-      toast.error("Invalid credentials or server error");
-    } else if (res?.ok) {
-      toast.success("Successfully logged in");
-      router.push("/");
+      if (res?.error) {
+        toast.error(res.error === "CredentialsSignin" ? "Invalid email or password" : "An error occurred during sign in");
+      } else if (res?.ok) {
+        toast.success("Successfully logged in! Welcome back 👋");
+        router.push("/");
+      }
+    } catch (err: any) {
+      toast.error("Network error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md shadow-xl">
+      <Card className="w-full max-w-md shadow-xl border-t-4 border-t-black">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
+          <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
           <CardDescription>Use your email and password to access your dashboard</CardDescription>
         </CardHeader>
         <CardContent>
@@ -49,7 +53,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black transition-all duration-200"
                 placeholder="you@example.com"
               />
             </div>
@@ -60,11 +64,11 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black transition-all duration-200"
                 placeholder="••••••••"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full transition-transform active:scale-95" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </Button>
             <p className="text-center text-sm text-gray-600 mt-4">
