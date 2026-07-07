@@ -13,11 +13,15 @@ const app = new Hono();
 // Global Middlewares
 app.use('*', logger());
 app.use('*', rateLimiter);
+
+const allowedOrigins = [
+  'http://127.0.0.1:3000', 'http://127.0.0.1:3001', 'http://127.0.0.1:3002',
+  'http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002',
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+];
+
 app.use('*', cors({
-  origin: [
-    'http://127.0.0.1:3000', 'http://127.0.0.1:3001', 'http://127.0.0.1:3002',
-    'http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'
-  ],
+  origin: allowedOrigins,
   credentials: true,
 }));
 app.use('*', errorMiddleware);
