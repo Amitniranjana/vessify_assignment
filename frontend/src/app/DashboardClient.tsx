@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { LogOut } from "lucide-react";
 
 export default function DashboardClient({ initialData, initialCursor }: { initialData: any[], initialCursor?: string }) {
+  const totalCredit = (txns: any[]) => txns.filter(t => t.type === 'CREDIT').reduce((s, t) => s + Math.abs(Number(t.amount)), 0);
+  const totalDebit  = (txns: any[]) => txns.filter(t => t.type === 'DEBIT').reduce((s, t) => s + Math.abs(Number(t.amount)), 0);
   const [text, setText] = useState("");
   const [transactions, setTransactions] = useState<any[]>(initialData);
   const [cursor, setCursor] = useState<string | undefined>(initialCursor);
@@ -138,6 +140,37 @@ export default function DashboardClient({ initialData, initialCursor }: { initia
                         </TableCell>
                       </TableRow>
                     ))}
+                      {/* NET SUMMARY ROW */}
+                      {transactions.length > 0 && (() => {
+                        const credit = totalCredit(transactions);
+                        const debit  = totalDebit(transactions);
+                        const net    = credit - debit;
+                        const isPositive = net >= 0;
+                        return (
+                          <TableRow className="border-t-2 border-indigo-200 bg-indigo-50/60 font-bold">
+                            <TableCell className="text-indigo-900 font-bold text-sm whitespace-nowrap">NET BALANCE</TableCell>
+                            <TableCell className="text-indigo-700 text-xs">
+                              <span className="inline-flex gap-3">
+                                <span className="text-emerald-600">+₹{credit.toFixed(2)} credit</span>
+                                <span className="text-gray-400">−</span>
+                                <span className="text-rose-600">₹{debit.toFixed(2)} debit</span>
+                              </span>
+                            </TableCell>
+                            <TableCell className={`text-right text-base font-extrabold tracking-tight whitespace-nowrap ${
+                              isPositive ? 'text-emerald-600' : 'text-rose-600'
+                            }`}>
+                              <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full border ${
+                                isPositive
+                                  ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
+                                  : 'bg-rose-50 border-rose-300 text-rose-700'
+                              }`}>
+                                {isPositive ? '▲' : '▼'} {isPositive ? '+' : '-'}₹{Math.abs(net).toFixed(2)}
+                              </span>
+                            </TableCell>
+                            <TableCell />
+                          </TableRow>
+                        );
+                      })()}
                   </TableBody>
                 </Table>
                 </div>
