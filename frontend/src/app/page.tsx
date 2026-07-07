@@ -11,7 +11,8 @@ export default async function Home() {
 
   // Pass session token securely from server to the client component
   // Usually the client component can fetch it, but passing it directly can be faster
-  const initialTransactions = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080'}/api/transactions?limit=20`, {
+  const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080';
+  const initialTransactions = await fetch(`${apiUrl}/api/transactions?limit=20`, {
     headers: {
       Authorization: `Bearer ${(session as any).sessionToken}`
     }

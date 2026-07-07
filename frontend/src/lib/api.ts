@@ -1,4 +1,4 @@
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
 
 export const fetchAPI = async (endpoint: string, options: RequestInit = {}) => {
   const session = await getSession();
@@ -22,7 +22,10 @@ export const fetchAPI = async (endpoint: string, options: RequestInit = {}) => {
   });
 
   if (res.status === 401) {
-    // Handle unauthorized (maybe redirect to login)
+    // Sign out to clear the stale NextAuth JWT before redirecting.
+    // Without this, the user gets caught in an infinite loop:
+    // /login -> auth() detects valid NextAuth session -> redirect to / -> 401 again.
+    await signOut({ redirect: false });
     if (typeof window !== "undefined") {
       window.location.href = "/login";
     }
