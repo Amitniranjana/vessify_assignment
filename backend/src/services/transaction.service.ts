@@ -24,7 +24,7 @@ export function parseTransaction(text: string): ParsedTransaction | null {
     if (text.match(dateRegex1)) {
         date = new Date(`${dateMatch[1]} ${dateMatch[2]} ${dateMatch[3].length === 2 ? '20'+dateMatch[3] : dateMatch[3]} UTC`);
     } else if (text.match(dateRegex2)) {
-        date = new Date(`${dateMatch[3].length === 2 ? '20'+dateMatch[3] : dateMatch[3]}-${dateMatch[1]}-${dateMatch[2]} UTC`);
+        date = new Date(`${dateMatch[3].length === 2 ? '20'+dateMatch[3] : dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]} UTC`);
     } else {
         date = new Date(`${dateMatch[0]} UTC`);
     }
@@ -32,9 +32,9 @@ export function parseTransaction(text: string): ParsedTransaction | null {
   }
 
   // 2. Parse Amount
-  const amountRegex = /(-?)(?:₹|Rs\.?|\$)\s?([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]{2})?)/i;
-  const fallbackAmountRegex = /(?:Amount:\s*)(-?[0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]{2})?)/i;
-  const trailingAmountRegex = /(-?[0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]{2})?)\s*(Dr|Cr|debited|credited)/i;
+  const amountRegex = /(-?)(?:₹|Rs\.?|\$)\s?([0-9]+(?:,[0-9]{3})*(?:\.[0-9]{2})?)/i;
+  const fallbackAmountRegex = /(?:Amount:\s*)(-?[0-9]+(?:,[0-9]{3})*(?:\.[0-9]{2})?)/i;
+  const trailingAmountRegex = /(-?[0-9]+(?:,[0-9]{3})*(?:\.[0-9]{2})?)\s*(Dr|Cr|debited|credited)/i;
 
   let amtMatch = textWithoutDate.match(amountRegex) || textWithoutDate.match(fallbackAmountRegex) || textWithoutDate.match(trailingAmountRegex);
   
@@ -108,7 +108,7 @@ export function parseTransactions(text: string): ParsedTransaction[] {
   }
 
   // Split by common line breaks
-  const lines = text.split(/\r?\n|(?<=\d{2}\.\d{2}\s)/);
+  const lines = text.split(/\r?\n/);
   const transactions: ParsedTransaction[] = [];
   
   // Also try splitting by date patterns if it's all on one line
