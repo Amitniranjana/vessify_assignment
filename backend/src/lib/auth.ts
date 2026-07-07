@@ -11,9 +11,11 @@ export const auth = betterAuth({
         enabled: true,
     },
     secret: process.env.BETTER_AUTH_SECRET || "my-super-secret-better-auth-secret",
+    baseURL: process.env.BETTER_AUTH_URL || "http://127.0.0.1:8080",
     trustedOrigins: [
         "http://127.0.0.1:3000", "http://127.0.0.1:3001", "http://127.0.0.1:3002",
-        "http://localhost:3000", "http://localhost:3001", "http://localhost:3002"
+        "http://localhost:3000", "http://localhost:3001", "http://localhost:3002",
+        ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
     ],
     plugins: [bearer()],
     databaseHooks: {
