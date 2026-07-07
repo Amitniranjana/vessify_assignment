@@ -39,15 +39,20 @@ export function parseTransaction(text: string): ParsedTransaction | null {
   let amtMatch = textWithoutDate.match(amountRegex) || textWithoutDate.match(fallbackAmountRegex) || textWithoutDate.match(trailingAmountRegex);
   
   if (amtMatch) {
-    // If amountRegex was used, amtMatch[1] is the minus sign (if any), and amtMatch[2] is the number
-    // For other regexes, amtMatch[1] is the number (possibly with minus)
-    let numStr = amtMatch.length > 2 && amtMatch[2] !== undefined ? amtMatch[2] : amtMatch[1];
+    // amountRegex: amtMatch[1]=sign, amtMatch[2]=number
+    // fallbackAmountRegex / trailingAmountRegex: amtMatch[1]=number, amtMatch[2]=Dr/Cr keyword
+    // Only use amtMatch[2] as the number if it is NOT a debit/credit keyword
+    const DEBIT_CREDIT_KW = /^(Dr|Cr|debited|credited)$/i;
+    let numStr = (amtMatch.length > 2 && amtMatch[2] !== undefined && !DEBIT_CREDIT_KW.test(amtMatch[2]))
+      ? amtMatch[2]
+      : amtMatch[1];
     let isNegativeMatch = amtMatch[1] === '-' || numStr.startsWith('-');
     
     let parsedAmount = parseFloat(numStr.replace(/,/g, ''));
     
-    const isDebit = /debited|Dr/i.test(text) && !/credited|Cr|\+/i.test(text);
-    const isCredit = /credited|Cr|\+/i.test(text);
+    // Use word boundaries so 'CREDITCARD' does NOT falsely match 'Cr'
+    const isDebit  = /\b(debited|Dr)\b/i.test(text) && !/\b(credited|Cr)\b|\+/i.test(text);
+    const isCredit = /\b(credited|Cr)\b|\+/i.test(text);
     
     // Explicit negative check from fallback
     if (isNegativeMatch) {
@@ -79,7 +84,7 @@ export function parseTransaction(text: string): ParsedTransaction | null {
     confidence += 0.1;
   }
 
-  if (!date || amount === 0 || !description || isNaN(date.getTime())) {
+  if (!date || amount === 0 || isNaN(amount) || !description || isNaN(date.getTime())) {
     return null;
   }
 
