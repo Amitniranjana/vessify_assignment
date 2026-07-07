@@ -13,7 +13,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/auth/sign-in/email`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080'}/api/auth/sign-in/email`, {
             method: 'POST',
             body: JSON.stringify({
               email: credentials.email,
@@ -21,7 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }),
             headers: { 
               "Content-Type": "application/json",
-              "Origin": process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+              "Origin": process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:3000'
             }
           });
 

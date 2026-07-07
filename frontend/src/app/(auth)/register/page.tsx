@@ -20,7 +20,7 @@ export default function RegisterPage() {
 
     try {
       // Direct call to backend to register since Auth.js doesn't natively handle registration endpoints
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/auth/sign-up/email`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080'}/api/auth/sign-up/email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, name }),

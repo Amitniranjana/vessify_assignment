@@ -16,7 +16,7 @@ export const fetchAPI = async (endpoint: string, options: RequestInit = {}) => {
   // However, BetterAuth might also expect cookies. 
   // By passing Authorization: Bearer {token}, Better Auth explicitly handles it.
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}${endpoint}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080'}${endpoint}`, {
     ...options,
     headers,
   });
