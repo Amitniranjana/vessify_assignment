@@ -14,14 +14,19 @@ const app = new Hono();
 app.use('*', logger());
 app.use('*', rateLimiter);
 
-const allowedOrigins = [
-  'http://127.0.0.1:3000', 'http://127.0.0.1:3001', 'http://127.0.0.1:3002',
-  'http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002',
-  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
-];
+// Allow localhost (dev) + any *.vercel.app URL (prod & preview deployments)
+const isAllowedOrigin = (origin: string): boolean => {
+  if (
+    origin.startsWith('http://localhost') ||
+    origin.startsWith('http://127.0.0.1')
+  ) return true;
+  if (origin.endsWith('.vercel.app') || origin === 'https://vercel.app') return true;
+  if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) return true;
+  return false;
+};
 
 app.use('*', cors({
-  origin: allowedOrigins,
+  origin: (origin) => isAllowedOrigin(origin) ? origin : '',
   credentials: true,
 }));
 app.use('*', errorMiddleware);

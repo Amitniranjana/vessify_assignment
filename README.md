@@ -1,94 +1,180 @@
-# Vessify Personal Finance Extractor
+# Vessify — Personal Finance Transaction Extractor
 
-A multi-tenant, production-ready full-stack application built to extract and manage personal finance transactions from messy bank statements. 
+A **multi-tenant, production-ready full-stack application** that extracts and manages personal finance transactions from messy, unstructured bank statement text using a custom Regex parser engine.
 
-## Live Demo
-🚀 **Frontend (Vercel):** [https://vessify-assignment-o3g7.vercel.app/](https://vessify-assignment-o3g7.vercel.app/)
-⚙️ **Backend API (Render):** [https://vessify-assignment-fyk3.onrender.com](https://vessify-assignment-fyk3.onrender.com)
-🗄️ **Database:** Supabase PostgreSQL
+## 🌐 Live Demo
 
-## Features
-- **Multi-Tenancy:** Secure data isolation using PostgreSQL `Organization` and `Member` tables.
-- **Transaction Parser Engine:** Automatically extracts dates, amounts, and calculates confidence scores from unstructured bank statements using Regex heuristics.
-- **Secure Authentication:** Better Auth on the backend coupled with Auth.js (NextAuth) on the frontend.
-- **Cursor-Based Pagination:** Highly scalable transaction fetching for large personal finance datasets.
-- **Rate Limiting:** In-memory sliding window rate limiter to protect backend APIs.
-- **Dockerized:** Full Docker Compose support for easy local deployments.
+| Service | URL |
+|---|---|
+| 🚀 Frontend (Vercel) | [https://vessify-assignment-o3g7.vercel.app](https://vessify-assignment-o3g7.vercel.app) |
+| ⚙️ Backend API (Render) | [https://vessify-assignment-fyk3.onrender.com](https://vessify-assignment-fyk3.onrender.com) |
+| 🗄️ Database | Supabase PostgreSQL |
 
-## Architecture & Tech Stack
-![Architecture Outline](https://via.placeholder.com/800x400?text=Architecture+Diagram+Placeholder)
+---
 
-- **Frontend:** Next.js 15 (App Router), TypeScript, Tailwind CSS, shadcn/ui, Auth.js.
-- **Backend:** Hono, TypeScript, Better Auth.
-- **Database:** PostgreSQL, Prisma ORM.
-- **Testing:** Jest + Supertest.
+## ✨ Features
 
-## Setup Instructions
+- **Multi-Tenancy** — Secure data isolation via `Organization` and `Member` tables. User A can never access User B's data.
+- **Transaction Parser Engine** — Custom Regex heuristics extract dates, amounts, types (DEBIT/CREDIT), and confidence scores from raw bank statement text.
+- **Secure Authentication** — [Better Auth](https://better-auth.com) on the backend + [Auth.js (NextAuth)](https://authjs.dev) on the frontend, bridged via a Bearer token strategy.
+- **Cursor-Based Pagination** — Scalable transaction fetching using DB-level cursors.
+- **Rate Limiting** — In-memory sliding window rate limiter protecting all backend APIs.
+- **Dockerized** — Full Docker Compose support for local deployments.
+- **Dynamic CORS** — All Vercel preview and production deployments are automatically allowed.
 
-### 1. Environment Variables
-Create `.env` files in both the `backend/` and `frontend/` directories.
+---
 
-**`backend/.env`**
+## 🏗️ Architecture & Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Frontend** | Next.js 15 (App Router), TypeScript, Tailwind CSS, shadcn/ui, Auth.js |
+| **Backend** | Hono, TypeScript, Better Auth, Node.js |
+| **Database** | PostgreSQL (Supabase), Prisma ORM |
+| **Deployment** | Vercel (frontend), Render (backend), Supabase (DB) |
+| **Testing** | Jest + Supertest |
+
+---
+
+## 🚀 Local Setup
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/Amitniranjana/vessify_assignment
+cd vessify_assignment
+```
+
+### 2. Backend Environment
+
+Create `backend/.env`:
+
 ```env
-DATABASE_URL="postgresql://user:password@localhost:5432/finance_extractor?schema=public"
-BETTER_AUTH_SECRET="your_backend_secret"
+# Supabase — Connection Pooler (for runtime queries)
+DATABASE_URL="postgresql://user:password@pooler.supabase.com:6543/postgres?pgbouncer=true"
+
+# Supabase — Direct Connection (for migrations)
+DIRECT_URL="postgresql://user:password@pooler.supabase.com:5432/postgres"
+
+# Better Auth
+BETTER_AUTH_SECRET="your-secret-here"
+BETTER_AUTH_URL="http://localhost:8080"
+
+# CORS — set to your frontend URL in production
+FRONTEND_URL="http://localhost:3000"
+
 PORT=8080
 ```
 
-**`frontend/.env.local`**
+### 3. Frontend Environment
+
+Create `frontend/.env.local`:
+
 ```env
+# Backend API URL
 NEXT_PUBLIC_API_URL="http://localhost:8080"
-AUTH_SECRET="your_nextauth_secret"
+API_URL="http://localhost:8080"
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+AUTH_SECRET="your-nextauth-secret-here"
 ```
 
-### 2. Database Migration
-Make sure your PostgreSQL instance is running.
+### 4. Database Migration
+
 ```bash
 cd backend
 npx prisma db push
 ```
 
-### 3. Run Commands
-**Run Backend:**
+### 5. Run Locally
+
+**Backend:**
 ```bash
 cd backend
 npm install
-npm run dev
+npm run dev        # http://localhost:8080
 ```
 
-**Run Frontend:**
+**Frontend:**
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev        # http://localhost:3000
 ```
 
-### 4. Run via Docker Compose
-If you have Docker installed, simply run from the root directory:
+### 6. Docker Compose (Alternative)
+
 ```bash
 docker-compose up --build
 ```
-The frontend will be available at `http://localhost:3000` and the backend at `http://localhost:8080`.
 
-## API Documentation
+Frontend → `http://localhost:3000` | Backend → `http://localhost:8080`
+
+---
+
+## ☁️ Production Deployment
+
+### Render (Backend)
+
+Set these environment variables in **Render → Environment**:
+
+| Key | Value |
+|---|---|
+| `DATABASE_URL` | Supabase pooled URL (port 6543) |
+| `DIRECT_URL` | Supabase direct URL (port 5432) |
+| `BETTER_AUTH_SECRET` | Your secret key |
+| `BETTER_AUTH_URL` | `https://your-backend.onrender.com` |
+| `FRONTEND_URL` | `https://your-frontend.vercel.app` |
+
+**Build Command:** `npm install && npm run build`  
+**Start Command:** `npm start`  
+**Pre-Deploy Command:** `npx prisma db push`
+
+### Vercel (Frontend)
+
+Set these environment variables in **Vercel → Settings → Environment Variables**:
+
+| Key | Value |
+|---|---|
+| `NEXT_PUBLIC_API_URL` | `https://your-backend.onrender.com` |
+| `API_URL` | `https://your-backend.onrender.com` |
+| `NEXTAUTH_URL` | `https://your-frontend.vercel.app` |
+| `AUTH_SECRET` | Your NextAuth secret |
+
+---
+
+## 📡 API Reference
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| POST | `/api/auth/sign-up/email` | Public | Registers a user and creates an Organization. |
-| POST | `/api/auth/sign-in/email` | Public | Authenticates and returns a session token. |
-| POST | `/api/transactions/extract` | JWT | Parses text and saves transaction. |
-| GET | `/api/transactions?limit=20` | JWT | Fetches paginated transactions. |
+| `POST` | `/api/auth/sign-up/email` | Public | Register user + auto-create Organization |
+| `POST` | `/api/auth/sign-in/email` | Public | Authenticate and get session token |
+| `POST` | `/api/transactions/extract` | Bearer JWT | Parse text and save transactions |
+| `GET` | `/api/transactions?limit=20` | Bearer JWT | Fetch paginated transactions |
 
-## Multi-Tenancy & Authentication Approach
-We use **Better Auth** to manage users, sessions, and passwords natively on our Hono edge-compatible backend. When a user registers, a `databaseHook` provisions an `Organization`. 
+---
 
-The frontend uses **Auth.js** to proxy the login request, encasing the Better Auth `sessionToken` inside its own encrypted JWT. Our custom API client automatically unpacks this token and injects it as an `Authorization: Bearer` header on protected requests.
+## 🔐 Authentication & Multi-Tenancy
 
-Every backend endpoint is guarded by a custom `authMiddleware` which securely extracts the `organizationId` from the DB and forces it into the request context. This makes it impossible for `User A` to query `User B`'s data, strictly enforcing multi-tenancy.
+**Better Auth** manages users, sessions, and passwords natively on the Hono backend. On registration, a `databaseHook` automatically provisions an `Organization` for each new user.
 
-## Testing
-To run the backend test suite (covering Auth, Extractions, Pagination, and User Isolation):
+The frontend uses **Auth.js** to proxy login requests, encasing the Better Auth `sessionToken` inside its own encrypted JWT. The custom API client automatically unpacks and injects this token as an `Authorization: Bearer` header on all protected requests.
+
+Every backend endpoint is guarded by `authMiddleware` which:
+1. Validates the Bearer token via Better Auth
+2. Fetches the user's `organizationId` from DB
+3. Injects it into the request context
+
+This makes it **architecturally impossible** for User A to access User B's data.
+
+---
+
+## 🧪 Testing
+
 ```bash
 cd backend
 npm run test
 ```
+
+Covers: Authentication, Transaction Extraction, Pagination, and Multi-tenant User Isolation.
