@@ -10,6 +10,15 @@ A **multi-tenant, production-ready full-stack application** that extracts and ma
 | ⚙️ Backend API (Render) | [https://vessify-assignment-fyk3.onrender.com](https://vessify-assignment-fyk3.onrender.com) |
 | 🗄️ Database | Supabase PostgreSQL |
 
+> **⚠️ Performance Note for Reviewers**
+>
+> The initial sign-up / sign-in request may take **5–15 seconds**. This is expected due to two compounding factors on the free tier:
+>
+> 1. **Render Cold Start** — Render's free-tier spins down the backend after ~15 minutes of inactivity. The first request wakes it up, causing a delay. Subsequent requests are fast.
+> 2. **Cross-Region Latency** — The Supabase PostgreSQL database is hosted in **US East (North Virginia)**, while requests originate from India. Each auth request makes multiple DB round-trips (session creation, user lookup, org provisioning), each of which incurs ~200–300ms of transatlantic latency.
+>
+> **In a production setup**, this would be resolved by co-locating the DB and backend in the same region (e.g., both in `ap-south-1` Mumbai), or using Supabase's connection pooler with a read replica closer to users. For the scope of this assignment, free-tier infrastructure was used to keep deployment accessible.
+
 ---
 
 ## ✨ Features
