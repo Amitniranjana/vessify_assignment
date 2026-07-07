@@ -85,3 +85,13 @@ export const getTransactions = async (c: Context) => {
     nextCursor,
   });
 };
+
+export const deleteAllTransactions = async (c: Context) => {
+  const organizationId = c.get('organizationId');
+  if (!organizationId) {
+    return c.json({ error: 'Missing organization context' }, 403);
+  }
+  await prisma.transaction.deleteMany({ where: { organizationId } });
+  return c.json({ success: true });
+};
+
